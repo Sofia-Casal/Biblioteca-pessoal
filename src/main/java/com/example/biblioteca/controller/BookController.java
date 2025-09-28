@@ -30,8 +30,8 @@ public class BookController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
         return ResponseEntity.ok(livro);
-        }
-        @GetMapping("/{id}")
+    }
+    @GetMapping("/{id}")
     public ResponseEntity<Book> buscarPorId(@PathVariable Long id) {
         Book livro = service.buscarPorId(id);
         if (livro == null)

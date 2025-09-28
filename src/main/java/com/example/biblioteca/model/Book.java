@@ -21,7 +21,7 @@ public class Book {
 
     @Min(value = 0, message = "A nota mínima é 0")
     @Max(value = 5, message = "A nota máxima é 5")
-    private Integer nota;
+    private int nota = 0;
 
     @NotBlank(message = "O status de leitura é obrigatório")
     private String statusLeitura;
@@ -51,10 +51,10 @@ public class Book {
     public void setNota(int nota) {
         this.nota = nota;
     }
-    public boolean isTerminado() {
+    public boolean isLido() {
         return terminado;
     }
-    public void setTerminado(boolean terminado) {
-        this.terminado = terminado;
+    public void setLido(boolean lido) {
+        this.terminado = lido;
     }
 }
