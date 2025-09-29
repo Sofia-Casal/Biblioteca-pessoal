@@ -1,10 +1,109 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Livros</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body>
+<body class="bg-light">
+<div class="container py-4">
+    <h1 class="mb-4">Livros</h1>
 
+    <!-- Formulário de adicionar -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Adicionar</h5>
+            <form class="row g-2" method="post" th:action="@{/livros}">
+                <div class="col-md-4">
+                    <input class="form-control" placeholder="Título" name="titulo" required>
+                </div>
+                <div class="col-md-4">
+                    <input class="form-control" placeholder="Autor" name="autor" required>
+                </div>
+                <div class="col-md-2">
+                    <input class="form-control" type="number" name="nota" min="0" max="5" value="0">
+                </div>
+                <div class="col-md-2 d-flex align-items-center">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="lido" id="novoLido">
+                        <label class="form-check-label" for="novoLido">Lido</label>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <button class="btn btn-primary" type="submit">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Tabela -->
+    <div class="table-responsive">
+        <table class="table table-striped align-middle">
+            <thead>
+            <tr>
+                <th>ID</th><th>Título</th><th>Autor</th><th>Nota</th><th>Lido</th><th class="text-end">Ações</th>
+            </tr>
+            </thead>
+            <tbody>
+            <!-- Loop para cada livro -->
+            <th:block th:each="l : ${livros}">
+                <tr>
+                    <td th:text="${l.id}"></td>
+                    <td th:text="${l.titulo}"></td>
+                    <td th:text="${l.autor}"></td>
+                    <td th:text="${l.nota}"></td>
+                    <td><span th:text="${l.lido} ? 'Sim' : 'Não'"></span></td>
+                    <td class="text-end">
+                        <!-- Botão editar -->
+                        <button class="btn btn-sm btn-warning" type="button"
+                                data-bs-toggle="collapse"
+                                th:attr="data-bs-target='#edit__' + ${l.id}">
+                            Editar
+                        </button>
+
+                        <!-- Botão excluir -->
+                        <form th:action="@{'/livros/' + ${l.id} + '/excluir'}" method="post" class="d-inline">
+                            <button class="btn btn-sm btn-danger" type="submit">Excluir</button>
+                        </form>
+                    </td>
+                </tr>
+
+                <!-- Linha de edição -->
+                <tr class="collapse" th:id="${'edit__' + l.id}">
+                    <td colspan="6">
+                        <form class="row g-2" th:action="@{'/livros/' + ${l.id}}" method="post">
+                            <div class="col-md-4">
+                                <input class="form-control" name="titulo" th:value="${l.titulo}" required>
+                            </div>
+                            <div class="col-md-4">
+                                <input class="form-control" name="autor" th:value="${l.autor}" required>
+                            </div>
+                            <div class="col-md-2">
+                                <input class="form-control" type="number" name="nota" min="0" max="5" th:value="${l.nota}">
+                            </div>
+                            <div class="col-md-2 d-flex align-items-center">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="lido" th:checked="${l.lido}">
+                                    <label class="form-check-label">Lido</label>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <button class="btn btn-success btn-sm" type="submit">Salvar alterações</button>
+                            </div>
+                        </form>
+                    </td>
+                </tr>
+            </th:block>
+
+            <!-- Caso não tenha livros -->
+            <tr th:if="${#lists.isEmpty(livros)}">
+                <td colspan="6" class="text-center text-muted">Sem registros</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
