@@ -23,9 +23,9 @@ public class Book {
 
     private boolean lido;
 
-    @Min(value = 0, message = "A nota mínima é 0")
-    @Max(value = 5, message = "A nota máxima é 5")
-    private int nota = 0;
+    @DecimalMin(value = "0.0", message = "A nota mínima é 0")
+    @DecimalMax(value = "5.0", message = "A nota máxima é 5")
+    private double nota = 0.0;
 
     public Long getId() {
         return id;
@@ -74,10 +74,10 @@ public class Book {
         this.lido = lido;
     }
 
-    public int getNota() {
+    public double getNota() {
         return nota;
     }
-    public void setNota(int nota) {
+    public void setNota(double nota) {
         this.nota = nota;
     }
 }
