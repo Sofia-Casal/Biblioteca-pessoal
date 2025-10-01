@@ -9,7 +9,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
-@RequestMapping("/livros")
 public class BookController {
     private final BookService service;
 
@@ -17,13 +16,13 @@ public class BookController {
         this.service = service;
     }
 
-    @GetMapping
+    @GetMapping("/livros")
     public String listar(Model model) {
         model.addAttribute("livros", service.listarTodos());
         return "lista";
     }
 
-    @GetMapping("/titulo")
+    @GetMapping("/livros/titulo")
     public ResponseEntity<Book> buscaPorTitulo(@RequestParam String q) {
         Book livro = service.buscarPorTitulo(q);
         if (livro == null) {
@@ -31,21 +30,25 @@ public class BookController {
         }
         return ResponseEntity.ok(livro);
     }
-    @GetMapping("/{id}")
+    @GetMapping("/livros/{id}")
     public ResponseEntity<Book> buscarPorId(@PathVariable Long id) {
         Book livro = service.buscarPorId(id);
         if (livro == null)
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         return ResponseEntity.ok(livro);
     }
-    @PostMapping("/{id}")
+    @PostMapping({"/livros", "/livros/"})
+    public String criar(@ModelAttribute Book livro) {
+        service.salvar(livro);
+        return "redirect:/livros";
+    }
+    @PostMapping({"/livros/{id}", "/livros/{id}/"})
     public String atualizar(@PathVariable Long id, @ModelAttribute Book livro) {
         livro.setId(id);
         service.salvar(livro);
-        return "redirect: /livros";
+        return "redirect:/livros";
     }
-
-    @PostMapping("/{id}/excluir")
+    @PostMapping({"/livros/{id}/excluir", "/livros/{id}/excluir/"})
     public ResponseEntity<Void> excluir(@PathVariable Long id) {
         service.remover(id);
         return ResponseEntity.noContent().build();

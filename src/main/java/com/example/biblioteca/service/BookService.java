@@ -18,7 +18,7 @@ public class BookService {
         return repository.findById(id).orElse(null);
     }
     public Book buscarPorTitulo(String titulo) {
-        return repository.findByTituloContainingIgnoreCase(titulo);
+        return repository.findByTituloContainingIgnoreCase(titulo).orElse(null);
     }
     public Book salvar(Book livro) {
         return repository.save(livro);
