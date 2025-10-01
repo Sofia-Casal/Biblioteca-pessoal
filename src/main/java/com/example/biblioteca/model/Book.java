@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import java.time.LocalDate;
 
+
 @Entity
 public class Book {
 
@@ -11,13 +12,17 @@ public class Book {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "O título é obrigatório!")
+    @NotBlank(message = "O título é obrigatório")
+    @Pattern(regexp = "^[A-Za-zÀ-ÿ0-9 ,.?!-]+$", message = "O título contém caracteres inválidos")
     private String titulo;
 
-    @NotBlank(message = "O nome do autor é obrigatório!")
+    @NotBlank(message = "O autor é obrigatório")
+    @Pattern(regexp = "^[A-Za-zÀ-ÿ ]+$", message = "O nome do autor deve conter apenas letras e espaços")
     private String autor;
 
+    @Pattern(regexp = "^[A-Za-zÀ-ÿ ]*$", message = "O gênero deve conter apenas letras e espaços")
     private String genero;
+
     private LocalDate dataInicio;
     private LocalDate dataFim;
 
@@ -37,7 +42,9 @@ public class Book {
     public String getTitulo() {
         return titulo;
     }
-    public void setTitulo(String titulo) { this.titulo = titulo; }
+    public void setTitulo(String titulo) {
+        this.titulo = titulo;
+    }
 
     public String getAutor() {
         return autor;

@@ -8,45 +8,84 @@
 </head>
 <body class="bg-light">
 <div class="container py-4">
-    <h1 class="mb-4">Livros</h1>
+    <h1 class="mb-3">Livros</h1>
 
-    <!-- Formulário de adicionar -->
+    <div th:if="${sucesso}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <span th:text="${sucesso}">Sucesso!</span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    <div th:if="${erro}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <span th:text="${erro}">Erro!</span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <form class="row g-2 align-items-center mb-4" method="get" th:action="@{/livros}">
+        <div class="col-md-6">
+            <input class="form-control" name="q" placeholder="Pesquisar por título..." th:value="${busca}">
+        </div>
+        <div class="col-auto">
+            <button class="btn btn-outline-primary" type="submit">Buscar</button>
+        </div>
+        <div class="col-auto" th:if="${busca}">
+            <a class="btn btn-outline-secondary" th:href="@{/livros}">Limpar</a>
+        </div>
+    </form>
+
     <div class="card mb-4">
         <div class="card-body">
             <h5 class="card-title">Adicionar</h5>
-            <form class="row g-2" method="post" th:action="@{/livros}">
+
+            <form class="row g-3" method="post" th:action="@{/livros}" th:object="${livro}">
                 <div class="col-md-3">
-                    <input class="form-control" placeholder="Título" name="titulo" required>
+                    <label class="form-label">Título <span class="text-danger">*</span></label>
+                    <input class="form-control" th:field="*{titulo}" placeholder="Digite o título">
+                    <div class="text-danger small" th:errors="*{titulo}"></div>
                 </div>
+
                 <div class="col-md-3">
-                    <input class="form-control" placeholder="Autor" name="autor" required>
+                    <label class="form-label">Autor <span class="text-danger">*</span></label>
+                    <input class="form-control" th:field="*{autor}" placeholder="Digite o autor">
+                    <div class="text-danger small" th:errors="*{autor}"></div>
                 </div>
+
                 <div class="col-md-2">
-                    <input class="form-control" placeholder="Gênero" name="genero">
+                    <label class="form-label">Gênero</label>
+                    <input class="form-control" th:field="*{genero}" placeholder="Ex.: Fantasia">
+                    <div class="text-danger small" th:errors="*{genero}"></div>
                 </div>
+
                 <div class="col-md-2">
-                    <input class="form-control" type="date" name="dataInicio">
+                    <label class="form-label">Data de início</label>
+                    <input class="form-control" type="date" th:field="*{dataInicio}">
+                    <div class="text-danger small" th:errors="*{dataInicio}"></div>
                 </div>
+
                 <div class="col-md-2">
-                    <input class="form-control" type="date" name="dataFim">
+                    <label class="form-label">Data de fim</label>
+                    <input class="form-control" type="date" th:field="*{dataFim}">
+                    <div class="text-danger small" th:errors="*{dataFim}"></div>
                 </div>
+
                 <div class="col-md-2">
-                    <input class="form-control" type="number" name="nota" min="0" max="5" step="0.5" value="0.0">
+                    <label class="form-label">Nota (0–5)</label>
+                    <input class="form-control" type="number" th:field="*{nota}" min="0" max="5" step="0.5" value="0.0">
+                    <div class="text-danger small" th:errors="*{nota}"></div>
                 </div>
+
                 <div class="col-md-2 d-flex align-items-center">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="lido" id="novoLido">
+                    <div class="form-check mt-4">
+                        <input class="form-check-input" type="checkbox" th:field="*{lido}" id="novoLido">
                         <label class="form-check-label" for="novoLido">Lido</label>
                     </div>
                 </div>
+
                 <div class="col-12">
-                    <button class="btn btn-primary">Salvar</button>
+                    <button class="btn btn-primary" type="submit">Salvar</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Tabela -->
     <div class="table-responsive">
         <table class="table table-striped align-middle">
             <thead>
@@ -56,66 +95,70 @@
             </tr>
             </thead>
             <tbody>
-            <!-- Loop nos livros -->
-            <tr th:each="l : ${livros}">
-                <td th:text="${l.id}"></td>
-                <td th:text="${l.titulo}"></td>
-                <td th:text="${l.autor}"></td>
-                <td th:text="${l.genero}"></td>
-                <td th:text="${l.dataInicio}"></td>
-                <td th:text="${l.dataFim}"></td>
-                <td th:text="${l.nota}"></td>
-                <td><span th:text="${l.lido} ? 'Sim' : 'Não'"></span></td>
-                <td class="text-end">
-                    <!-- Botão editar -->
-                    <button class="btn btn-sm btn-warning" type="button"
-                            data-bs-toggle="collapse"
-                            th:attr="data-bs-target='#edit__' + ${l.id}">
-                        Editar
-                    </button>
-                    <!-- Botão excluir -->
-                    <form th:action="@{'/livros/' + ${l.id} + '/excluir'}" method="post" class="d-inline">
-                        <button class="btn btn-sm btn-danger">Excluir</button>
-                    </form>
-                </td>
-            </tr>
+            <th:block th:each="l : ${livros}">
+                <tr>
+                    <td th:text="${l.id}"></td>
+                    <td th:text="${l.titulo}"></td>
+                    <td th:text="${l.autor}"></td>
+                    <td th:text="${l.genero}"></td>
+                    <td th:text="${l.dataInicio}"></td>
+                    <td th:text="${l.dataFim}"></td>
+                    <td th:text="${l.nota}"></td>
+                    <td><span th:text="${l.lido} ? 'Sim' : 'Não'"></span></td>
+                    <td class="text-end">
+                        <button class="btn btn-sm btn-warning" type="button"
+                                data-bs-toggle="collapse"
+                                th:attr="data-bs-target=${'#edit__' + l.id}">
+                            Editar
+                        </button>
+                        <form th:action="@{'/livros/' + ${l.id} + '/excluir'}" method="post" class="d-inline"
+                              onsubmit="return confirm('Tem certeza que deseja excluir este livro?');">
+                            <button class="btn btn-sm btn-danger" type="submit">Excluir</button>
+                        </form>
+                    </td>
+                </tr>
 
-            <!-- Linha de edição -->
-            <tr class="collapse" th:id="'edit__' + ${l.id}" th:each="l : ${livros}">
-                <td colspan="9">
-                    <form class="row g-2" th:action="@{'/livros/' + ${l.id}}" method="post">
-                        <div class="col-md-3">
-                            <input class="form-control" name="titulo" th:value="${l.titulo}" required>
-                        </div>
-                        <div class="col-md-3">
-                            <input class="form-control" name="autor" th:value="${l.autor}" required>
-                        </div>
-                        <div class="col-md-2">
-                            <input class="form-control" name="genero" th:value="${l.genero}">
-                        </div>
-                        <div class="col-md-2">
-                            <input class="form-control" type="date" name="dataInicio" th:value="${l.dataInicio}">
-                        </div>
-                        <div class="col-md-2">
-                            <input class="form-control" type="date" name="dataFim" th:value="${l.dataFim}">
-                        </div>
-                        <div class="col-md-2">
-                            <input class="form-control" type="number" name="nota" min="0" max="5" step="0.5" th:value="${l.nota}">
-                        </div>
-                        <div class="col-md-2 d-flex align-items-center">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" name="lido" th:checked="${l.lido}">
-                                <label class="form-check-label">Lido</label>
+                <tr class="collapse" th:id="|edit__${l.id}|">
+                    <td colspan="9">
+                        <form class="row g-3" th:action="@{'/livros/' + ${l.id}}" method="post">
+                            <div class="col-md-3">
+                                <label class="form-label">Título <span class="text-danger">*</span></label>
+                                <input class="form-control" name="titulo" th:value="${l.titulo}" required>
                             </div>
-                        </div>
-                        <div class="col-12">
-                            <button class="btn btn-success btn-sm">Salvar alterações</button>
-                        </div>
-                    </form>
-                </td>
-            </tr>
+                            <div class="col-md-3">
+                                <label class="form-label">Autor <span class="text-danger">*</span></label>
+                                <input class="form-control" name="autor" th:value="${l.autor}" required>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">Gênero</label>
+                                <input class="form-control" name="genero" th:value="${l.genero}">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">Data de início</label>
+                                <input class="form-control" type="date" name="dataInicio" th:value="${l.dataInicio}">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">Data de fim</label>
+                                <input class="form-control" type="date" name="dataFim" th:value="${l.dataFim}">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">Nota (0–5)</label>
+                                <input class="form-control" type="number" name="nota" min="0" max="5" step="0.5" th:value="${l.nota}">
+                            </div>
+                            <div class="col-md-2 d-flex align-items-center">
+                                <div class="form-check mt-4">
+                                    <input class="form-check-input" type="checkbox" name="lido" th:checked="${l.lido}">
+                                    <label class="form-check-label">Lido</label>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <button class="btn btn-success btn-sm" type="submit">Salvar alterações</button>
+                            </div>
+                        </form>
+                    </td>
+                </tr>
+            </th:block>
 
-            <!-- Caso não tenha livros -->
             <tr th:if="${#lists.isEmpty(livros)}">
                 <td colspan="9" class="text-center text-muted">Sem registros</td>
             </tr>

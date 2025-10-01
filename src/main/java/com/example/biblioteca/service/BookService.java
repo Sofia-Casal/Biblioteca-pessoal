@@ -17,11 +17,17 @@ public class BookService {
     public Book buscarPorId(Long id) {
         return repository.findById(id).orElse(null);
     }
-    public Book buscarPorTitulo(String titulo) {
-        return repository.findByTituloContainingIgnoreCase(titulo).orElse(null);
+
+    public List<Book>
+    buscarPorTitulo(String titulo) {
+        return repository.findByTituloContainingIgnoreCase(titulo);
     }
-    public Book salvar(Book livro) {
-        return repository.save(livro);
+    public void salvar(Book livro) {
+        List<Book> existentes = repository.findByTituloAndAutor(livro.getTitulo(), livro.getAutor());
+        if (!existentes.isEmpty() && (livro.getId() == null || !existentes.get(0).getId().equals(livro.getId()))) {
+            throw new IllegalArgumentException("Já existe um livro com esse título e autor.");
+        }
+        repository.save(livro);
     }
     public void remover(Long id) {
         repository.deleteById(id);
