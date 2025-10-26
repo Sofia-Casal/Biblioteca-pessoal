@@ -12,6 +12,10 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.util.List;
 
 @Controller
+//@GetMapping("/livro")
+@SessionAttributes()
+
+
 public class BookController {
 
     private final BookService service;
@@ -22,25 +26,38 @@ public class BookController {
 
     // LISTA + BUSCA
     @GetMapping("/livros")
-    public String listar(@RequestParam(value = "q", required = false) String q, Model model) {
-        if (q == null || q.isBlank()) {
-            model.addAttribute("livros", service.listarTodos());
+    public String listar(@RequestParam(value = "q", required = false) String q, org.springframework.ui.Model model, jakarta.servlet.http.HttpSession session) {
+
+        if (session.getAttribute("usuarioEmail") == null) {
+            return "redirect:/login";
+        }
+        if (q != null) {
+            session.setAttribute("filtro", q);
         } else {
-            List<Book> livros = service.buscarPorTitulo(q);
+            q = (String) session.getAttribute("filtro");
+        }
+        java.util.List<com.example.biblioteca.model.Book> livros;
+        if (q == null || q.isBlank()) {
+            livros = service.listarTodos();
+        } else {
+            livros = service.buscarPorTitulo(q);
             model.addAttribute("busca", q);
             if (livros.isEmpty()) {
-                model.addAttribute("livros", List.of());
                 model.addAttribute("erro", "Nenhum livro encontrado para: " + q);
-            } else {
-                model.addAttribute("livros", livros);
             }
         }
-        model.addAttribute("livro", new Book());
+        model.addAttribute("livros", livros);
+        model.addAttribute("livro", new com.example.biblioteca.model.Book());
         return "lista";
     }
 
     @PostMapping({"/livros", "/livros/"})
     public String criar(@Valid @ModelAttribute("livro") Book livro, BindingResult result, RedirectAttributes ra, Model model) {
+
+        if (livro.getDataInicio() != null && livro.getDataFim() != null
+                && livro.getDataInicio().isAfter(livro.getDataFim())) {
+            result.reject("periodoInvalido", "A data de início não pode ser depois da data de fim.");
+        }
         if (result.hasErrors()) {
             model.addAttribute("livros", service.listarTodos());
             model.addAttribute("erro", result.getAllErrors().get(0).getDefaultMessage());
@@ -55,8 +72,14 @@ public class BookController {
         return "redirect:/livros";
     }
 
+
     @PostMapping({"/livros/{id}", "/livros/{id}/"})
     public String atualizar(@PathVariable Long id, @Valid @ModelAttribute Book livro, BindingResult result, RedirectAttributes ra) {
+
+        if (livro.getDataInicio() != null && livro.getDataFim() != null
+                && livro.getDataInicio().isAfter(livro.getDataFim())) {
+            result.reject("periodoInvalido", "A data de início não pode ser depois da data de fim.");
+        }
         if (result.hasErrors()) {
             ra.addFlashAttribute("erro", result.getAllErrors().get(0).getDefaultMessage());
             return "redirect:/livros";
@@ -73,4 +96,11 @@ public class BookController {
         ra.addFlashAttribute("sucesso", "Livro excluído com sucesso.");
         return "redirect:/livros";
     }
+
+    @GetMapping("/livros/limpar")
+    public String limparFiltro(jakarta.servlet.http.HttpSession session) {
+        session.removeAttribute("filtro");
+        return "redirect:/livros";
+    }
+
 }

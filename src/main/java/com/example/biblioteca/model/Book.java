@@ -12,6 +12,13 @@ public class Book {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @jakarta.validation.constraints.AssertTrue(message = "A data de início não pode ser depois da data de fim")
+    public boolean isPeriodoValido() {
+        if (dataInicio == null || dataFim == null) return true;
+        return !dataInicio.isAfter(dataFim);
+    }
+
+
     @NotBlank(message = "O título é obrigatório")
     @Pattern(regexp = "^[A-Za-zÀ-ÿ0-9 ,.?!-]+$", message = "O título contém caracteres inválidos")
     private String titulo;

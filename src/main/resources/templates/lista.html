@@ -8,7 +8,14 @@
 </head>
 <body class="bg-light">
 <div class="container py-4">
-    <h1 class="mb-3">Livros</h1>
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="mb-0">Livros</h1>
+        <div>
+            <span class="me-3" th:if="${session.usuarioNome}" th:text="'Olá, ' + ${session.usuarioNome}"></span>
+            <a class="btn btn-outline-danger btn-sm" th:href="@{/logout}">Sair</a>
+        </div>
+    </div>
 
     <div th:if="${sucesso}" class="alert alert-success alert-dismissible fade show" role="alert">
         <span th:text="${sucesso}">Sucesso!</span>
@@ -27,7 +34,7 @@
             <button class="btn btn-outline-primary" type="submit">Buscar</button>
         </div>
         <div class="col-auto" th:if="${busca}">
-            <a class="btn btn-outline-secondary" th:href="@{/livros}">Limpar</a>
+            <a class="btn btn-outline-secondary" th:href="@{/livros/limpar}">Limpar</a>
         </div>
     </form>
 
@@ -80,6 +87,10 @@
                 </div>
 
                 <div class="col-12">
+                    <div class="col-12" th:if="${#fields.hasGlobalErrors()}">
+                        <div class="alert alert-danger p-2" th:each="e : ${#fields.globalErrors()}" th:text="${e}"></div>
+                    </div>
+
                     <button class="btn btn-primary" type="submit">Salvar</button>
                 </div>
             </form>
